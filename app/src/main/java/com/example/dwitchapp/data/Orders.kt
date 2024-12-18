@@ -5,7 +5,7 @@ import com.example.dwitchapp.model.Order
 import com.example.dwitchapp.model.Store
 import com.example.dwitchapp.model.UsersPermissionsUser
 
-
+/*
 val ingredients = listOf(
     Ingredient(
         id = 48,
@@ -116,3 +116,4 @@ val orders = listOf(
         store = store
     )
 )
+*/

@@ -1,7 +1,9 @@
 package com.example.dwitchapp.model
 
 import com.example.dwitchapp.ui.theme.IngredientKind
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class Ingredient (
     val id: Long,
     val documentId: String,

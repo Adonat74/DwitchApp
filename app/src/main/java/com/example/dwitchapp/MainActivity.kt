@@ -5,8 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,66 +25,111 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color as Colors
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewModelScope
 import com.example.dwitchapp.ui.theme.DwitchAppTheme
-import com.example.dwitchapp.data.orders
 import com.example.dwitchapp.model.Order
+import com.example.dwitchapp.service.ApiClient
 import com.example.dwitchapp.ui.theme.OpenColors
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
-class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalMaterial3Api::class)
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            DwitchAppTheme {
-                Scaffold(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    topBar = {
-                        TopAppBar(
-                            title = {
-                                Row {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.baseline_refresh_24),
-                                        contentDescription = "Add"
-                                    )
-                                    Text(" Mes Commandes")
-                                }
-                            }
-                        )
-                    }
-                ) { innerPadding ->
-                    OrderList(
-                        orders = orders,
-                        modifier = Modifier
-                            .padding(innerPadding)
-                            .padding(10.dp)
-                            .fillMaxSize()
-                    )
-                }
+
+class OrdersViewModel : ViewModel() {
+    private val _orders = mutableStateOf<List<Order>>(emptyList())
+    val orders: State<List<Order>> = _orders
+
+    init {
+        fetchOrders()
+    }
+
+    private fun fetchOrders() {
+        viewModelScope.launch {
+            try {
+                val token = "Bearer 49b70f996ffbb654be996f8604d118bfca7624ced27749df6f4fdcac30b7009da1ba63ef7d6b91c8ca814baf88955daba2804396ab3b8cd2c03b50a1f96ff330032d2fbc2238338b4f7e25bff9e852b002c26ecca02fbf1e8e261cf6e0cdb00c042e35b33f64dda3522c3178ba1edb22b9daba42b51c1c8355309fd475b5d92b" // Normally you get this token from your auth process
+
+                val response = ApiClient.dwitchService.getOrders(token)
+                Timber.d("$response")
+                val orderList = response.data // This is List<Order>
+                _orders.value = orderList
+
+
+                //val result = ApiClient.dwitchService.getOrders(token)
+                //_orders.value = result
+            } catch (e: Exception) {
+                // handle error - for now we just print
+                Timber.d("Error fetching orders: ${e.message}")
             }
         }
     }
 }
 
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {
+            DwitchAppTheme {
+                MainScreen()
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OrderList(orders: List<Order>, modifier: Modifier = Modifier) {
+fun MainScreen() {
+
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = {
+                    Row {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_refresh_24),
+                            contentDescription = "Add"
+                        )
+                        Text(" Mes Commandes")
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        OrderList(
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(10.dp)
+                .fillMaxSize()
+        )
+    }
+}
+
+
+@Composable
+fun OrderList(viewModel: OrdersViewModel = viewModel(), modifier: Modifier = Modifier) {
+
+    val orders by viewModel.orders
     LazyColumn (modifier = modifier){
         items(orders) { order ->
-            Order(order, modifier = Modifier
+            OrderItem(order, modifier = Modifier
                 .padding(vertical = 10.dp)
             )
         }
@@ -94,14 +137,14 @@ fun OrderList(orders: List<Order>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun Order(order: Order, modifier: Modifier) {
+fun OrderItem(order: Order, modifier: Modifier) {
     Surface(
         shape = MaterialTheme.shapes.medium,
         modifier = modifier
             .shadow(4.dp, shape = RoundedCornerShape(15.dp))
             .fillMaxSize()
     ) {
-        Column(modifier = Modifier.padding(8.dp)) {
+        Column(modifier = Modifier.padding(8 .dp)) {
             OrderHeader(order)
             Text(
                 "${order.getMainCount()} Garniture(s) principale(s)  ${order.getToppingCount()} sauce(s)  ${order.ingredients.size} ingrédient(s)",
@@ -206,20 +249,15 @@ fun OrderFooter(order: Order) {
             modifier = Modifier
                 .padding(end = 10.dp)
         )
-        Text("${order.store.name} - ${order.store.city} ${order.store.zipCode}", fontWeight = FontWeight.SemiBold)
+        Text("${order.store?.name} - ${order.store?.city} ${order.store?.zipCode}", fontWeight = FontWeight.SemiBold)
     }
 }
-
-
-
-
-
 
 
 @Preview(showBackground = true)
 @Composable
 fun OrderListPreview() {
     DwitchAppTheme {
-        OrderList(orders)
+        MainScreen()
     }
 }

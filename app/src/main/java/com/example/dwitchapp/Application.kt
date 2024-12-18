@@ -15,3 +15,4 @@ class MyApplication : Application() {
         Timber.v("Verbose message")
     }
 }
+
