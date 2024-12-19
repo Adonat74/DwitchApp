@@ -2,13 +2,17 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.secrets.gradle)
 }
+
 
 android {
     namespace = "com.example.dwitchapp"
     compileSdk = 34
 
+
     defaultConfig {
+
         applicationId = "com.example.dwitchapp"
         minSdk = 26
         targetSdk = 34
@@ -18,6 +22,9 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+        secrets {
+            propertiesFileName = "secrets.properties"
         }
     }
 
@@ -38,7 +45,9 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
+
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"

@@ -1,7 +1,6 @@
 package com.example.dwitchapp.model
 
-import com.example.dwitchapp.model.Ingredient
-import com.squareup.moshi.Json
+
 import com.squareup.moshi.JsonClass
 import java.time.Instant
 import java.time.ZoneId
@@ -21,8 +20,8 @@ data class Order (
     val updatedAt: String?,
     val publishedAt: String?,
     val ingredients: List<Ingredient>,
-    //val usersPermissionsUser: UsersPermissionsUser?,
-    val users_permissions_user: UsersPermissionsUser?,
+    val usersPermissionsUser: UsersPermissionsUser?,
+    //val users_permissions_user: UsersPermissionsUser?,
     val store: Store?
 ) {
     fun getToppingCount(): Int {

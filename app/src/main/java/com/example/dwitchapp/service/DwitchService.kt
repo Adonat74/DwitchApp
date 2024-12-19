@@ -17,6 +17,7 @@ interface DwitchService {
     suspend fun getOrders(
         @Header("Authorization") token: String
     ): OrdersResponse
+
 }
 
 
@@ -25,13 +26,11 @@ object ApiClient {
         .add(Date::class.java, Rfc3339DateJsonAdapter())
         .build()
 
-
     private val retrofit = Retrofit.Builder()
         //... Les paramètres Retrofit ici (notamment un petit lien avec moshi)
         .baseUrl("https://dwitch.pickle-forge.app/api/")
         .addConverterFactory(MoshiConverterFactory.create(moshi))
         .build()
-
 
     // Puis créez votre service
     val dwitchService: DwitchService = retrofit.create(DwitchService::class.java)
