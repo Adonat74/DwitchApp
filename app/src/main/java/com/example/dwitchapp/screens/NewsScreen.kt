@@ -5,9 +5,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -18,8 +20,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -32,6 +37,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
 import com.example.dwitchapp.R
 import com.example.dwitchapp.model.news.News
 import com.example.dwitchapp.service.ApiClient
@@ -124,6 +131,8 @@ fun NewsList(viewModel: NewsViewModel = viewModel(), modifier: Modifier = Modifi
 
 @Composable
 fun NewsItem(new: News, modifier: Modifier) {
+    var imageState by remember { mutableStateOf("loading") }
+
 
     Surface(
         shape = MaterialTheme.shapes.medium,
@@ -140,8 +149,23 @@ fun NewsItem(new: News, modifier: Modifier) {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .height(160.dp)
-                    .fillMaxSize()
+                    .fillMaxSize(),
+                onLoading = { loadingState: AsyncImagePainter.State.Loading ->
+                    imageState = "loading"
+                },
+                onSuccess = { successState: AsyncImagePainter.State.Success ->
+                    imageState = "success"
+                },
+                onError = { errorState: AsyncImagePainter.State.Error ->
+                    imageState = "error"
+                }
             )
+            when (imageState) {
+                "loading" -> { CircularProgressIndicator(modifier = Modifier.size(50.dp)) }
+                "error" -> { Text("Failed to load image") }
+                "success" -> {}
+            }
+
             Column(
                 modifier = Modifier
                     .padding(8.dp)
@@ -156,3 +180,4 @@ fun NewsItem(new: News, modifier: Modifier) {
     }
 
 }
+
