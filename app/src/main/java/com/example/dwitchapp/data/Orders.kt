@@ -1,10 +1,5 @@
 package com.example.dwitchapp.data
 
-import com.example.dwitchapp.model.Ingredient
-import com.example.dwitchapp.model.Order
-import com.example.dwitchapp.model.Store
-import com.example.dwitchapp.model.UsersPermissionsUser
-
 /*
 val ingredients = listOf(
     Ingredient(

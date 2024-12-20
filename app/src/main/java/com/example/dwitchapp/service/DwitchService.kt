@@ -1,7 +1,8 @@
 package com.example.dwitchapp.service
 
 
-import com.example.dwitchapp.model.OrdersResponse
+import com.example.dwitchapp.model.news.NewsResponse
+import com.example.dwitchapp.model.orders.OrdersResponse
 import com.squareup.moshi.Moshi
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -17,6 +18,11 @@ interface DwitchService {
     suspend fun getOrders(
         @Header("Authorization") token: String
     ): OrdersResponse
+
+    @GET("posts?populate=*")
+    suspend fun getNews(
+        @Header("Authorization") token: String
+    ): NewsResponse
 
 }
 

@@ -1,4 +1,4 @@
-package com.example.dwitchapp.model
+package com.example.dwitchapp.model.orders
 
 import com.example.dwitchapp.ui.theme.IngredientKind
 import com.squareup.moshi.JsonClass

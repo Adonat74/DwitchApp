@@ -23,7 +23,7 @@ import com.example.dwitchapp.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountScreen() {
-    var refreshTrigger by remember { mutableIntStateOf(0) } // A state variable to trigger refetch
+//    var refreshTrigger by remember { mutableIntStateOf(0) } // A state variable to trigger refetch
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
@@ -34,7 +34,7 @@ fun AccountScreen() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Surface(onClick = {
-                            refreshTrigger++
+//                            refreshTrigger++
                         }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.baseline_refresh_24),
@@ -48,7 +48,7 @@ fun AccountScreen() {
         }
     ) { innerPadding ->
         OrderList(
-            refreshTrigger = refreshTrigger,
+//            refreshTrigger = refreshTrigger,
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(10.dp)

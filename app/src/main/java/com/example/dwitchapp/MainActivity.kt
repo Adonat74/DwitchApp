@@ -30,29 +30,7 @@ import com.example.dwitchapp.screens.OrdersScreen
 import com.example.dwitchapp.ui.theme.DwitchAppTheme
 
 
-//class OrdersViewModel : ViewModel() {
-//    private val _orders = mutableStateOf<List<Order>>(emptyList())
-//    val orders: State<List<Order>> = _orders
-//
-//    init {
-//        fetchOrders()
-//    }
-//
-//    private fun fetchOrders() {
-//        viewModelScope.launch {
-//            try {
-//                val token = "Bearer 49b70f996ffbb654be996f8604d118bfca7624ced27749df6f4fdcac30b7009da1ba63ef7d6b91c8ca814baf88955daba2804396ab3b8cd2c03b50a1f96ff330032d2fbc2238338b4f7e25bff9e852b002c26ecca02fbf1e8e261cf6e0cdb00c042e35b33f64dda3522c3178ba1edb22b9daba42b51c1c8355309fd475b5d92b" // Normally you get this token from your auth process
-//
-//                val response = ApiClient.dwitchService.getOrders(token)
-//                val orderList = response.data // This is List<Order>
-//                _orders.value = orderList
-//
-//            } catch (e: Exception) {
-//                Timber.d("Error fetching orders: ${e.message}")
-//            }
-//        }
-//    }
-//}
+
 
 
 class MainActivity : ComponentActivity() {
