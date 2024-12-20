@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.secrets.gradle)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 
@@ -75,6 +76,8 @@ dependencies {
     implementation(libs.moshi)
     implementation(libs.converter.moshi)
     implementation(libs.moshi.adapter)
+    implementation(libs.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
     ksp(libs.codegen)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

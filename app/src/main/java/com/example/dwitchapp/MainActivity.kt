@@ -1,57 +1,33 @@
 package com.example.dwitchapp
 
-import android.graphics.Color
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color as Colors
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewModelScope
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.dwitchapp.screens.AccountScreen
+import com.example.dwitchapp.screens.NewsScreen
+import com.example.dwitchapp.screens.OrdersScreen
 import com.example.dwitchapp.ui.theme.DwitchAppTheme
-import com.example.dwitchapp.model.Order
-import com.example.dwitchapp.service.ApiClient
-import com.example.dwitchapp.ui.theme.OpenColors
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 
 //class OrdersViewModel : ViewModel() {
@@ -79,223 +55,65 @@ import timber.log.Timber
 //}
 
 
-
-
 class MainActivity : ComponentActivity() {
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             DwitchAppTheme {
-                MainScreen()
-            }
-        }
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MainScreen() {
-    var refreshTrigger by remember { mutableIntStateOf(0) } // A state variable to trigger refetch
-
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Surface(onClick = {
-                            refreshTrigger++
-                        }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_refresh_24),
-                                contentDescription = "Add"
-                            )
+                val navController = rememberNavController()
+                Scaffold(
+                    bottomBar = {
+                        BottomAppBar {
+                            var selectedItem by remember { mutableIntStateOf(1) }
+                            val items = listOf("Account", "Orders", "News")
+                            val selectedIcons = listOf(Icons.Filled.Home, Icons.Filled.Favorite, Icons.Filled.Star)
+                            NavigationBar {
+                                items.forEachIndexed { index, item ->
+                                    NavigationBarItem(
+                                        icon = {
+                                            Icon(
+                                                selectedIcons[index],
+                                                contentDescription = item
+                                            )
+                                        },
+                                        label = { Text(item) },
+                                        selected = selectedItem == index,
+                                        onClick = {
+                                            selectedItem = index
+                                            navController.navigate(item)
+                                        }
+                                    )
+                                }
+                            }
                         }
-                        Text(" Mes Commandes")
+                    }
+                ){
+                    NavHost(
+                        navController = navController,
+                        startDestination = "Orders"
+                    ) {
+                        composable(route = "Account") {
+                            AccountScreen()
+                        }
+                        composable(route = "Orders") {
+                            OrdersScreen()
+                        }
+                        composable(route = "News") {
+                            NewsScreen()
+                        }
                     }
                 }
-            )
-        }
-    ) { innerPadding ->
-        OrderList(
-            refreshTrigger = refreshTrigger,
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(10.dp)
-                .fillMaxSize()
-        )
-    }
-}
-
-//view model way
-//@Composable
-//fun OrderList(viewModel: OrdersViewModel = viewModel(), modifier: Modifier = Modifier) {
-//    val orders by viewModel.orders
-//
-//
-//    LazyColumn (modifier = modifier){
-//        items(orders) { order ->
-//            OrderItem(order, modifier = Modifier
-//                .padding(vertical = 10.dp)
-//            )
-//        }
-//    }
-//}
-
-
-
-suspend fun fetchData(): List<Order> {
-    val token = "Bearer 49b70f996ffbb654be996f8604d118bfca7624ced27749df6f4fdcac30b7009da1ba63ef7d6b91c8ca814baf88955daba2804396ab3b8cd2c03b50a1f96ff330032d2fbc2238338b4f7e25bff9e852b002c26ecca02fbf1e8e261cf6e0cdb00c042e35b33f64dda3522c3178ba1edb22b9daba42b51c1c8355309fd475b5d92b"
-    val response = ApiClient.dwitchService.getOrders(token)
-    Timber.d("$response")
-    return response.data
-}
-
-// sans view model
-@Composable
-fun OrderList(refreshTrigger: Int, modifier: Modifier = Modifier) {
-    var orders by remember { mutableStateOf(emptyList<Order>()) }
-
-
-    LaunchedEffect(refreshTrigger) {
-        orders = fetchData()
-    }
-
-    LazyColumn (modifier = modifier){
-        items(orders) { order ->
-            OrderItem(order, modifier = Modifier
-                .padding(vertical = 10.dp)
-            )
-        }
-    }
-}
-
-@Composable
-fun OrderItem(order: Order, modifier: Modifier) {
-    Surface(
-        shape = MaterialTheme.shapes.medium,
-        modifier = modifier
-            .shadow(4.dp, shape = RoundedCornerShape(15.dp))
-            .fillMaxSize()
-    ) {
-        Column(modifier = Modifier.padding(8 .dp)) {
-            OrderHeader(order)
-            Text(
-                "${order.getMainCount()} Garniture(s) principale(s)  ${order.getToppingCount()} sauce(s)  ${order.ingredients.size} ingrédient(s)",
-                color = OpenColors.gray8,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 13.sp
-            )
-            IngredientsList(order)
-            ProgressBar(order)
-            HorizontalDivider(thickness = 1.dp, color = OpenColors.gray5)
-            OrderFooter(order)
-        }
-    }
-}
-
-
-
-
-@Composable
-fun IngredientsList(order: Order) {
-    LazyRow{
-        items(order.ingredients) { ingredient ->
-            Surface(
-                color = Colors(Color.parseColor(ingredient.getColor())),
-                shape = MaterialTheme.shapes.large,
-                modifier = Modifier
-                    .padding(vertical = 10.dp, horizontal = 3.dp)
-            ) {
-                Row (modifier = Modifier
-                    .padding(vertical = 3.dp, horizontal = 10.dp)
-                ) {
-                    Text(ingredient.getEmoji())
-                    Text(ingredient.name)
-                }
             }
         }
     }
 }
-
-
-@Composable
-fun ProgressBar(order: Order) {
-    Row (
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .padding(bottom = 10.dp)
-            .fillMaxSize()
-    ) {
-        Text("Progression", fontSize = 13.sp, letterSpacing = 0.4.sp)
-        LinearProgressIndicator(
-            progress = order.progress/100f,
-            color = OpenColors.gray9,
-            modifier = Modifier
-                .height(8.dp)
-                .width(220.dp)
-                .clip(RoundedCornerShape(16.dp))
-        )
-        Text("${order.progress}%", fontSize = 13.sp, letterSpacing = 0.4.sp)
-    }
-}
-
-@Composable
-fun OrderHeader(order: Order) {
-    Row(verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        Row{
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_shopping_bag_24),
-                contentDescription = "Add"
-            )
-            Text("Le ${order.getFormatedPlacedAtDate()}  ", fontWeight = FontWeight.SemiBold, fontSize = 20.sp)
-        }
-        Surface(
-            shape = MaterialTheme.shapes.small,
-            color = OpenColors.red3
-        ) {
-            Text(
-                "${order.price}€",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
-                modifier = Modifier
-                    .padding(6.dp)
-            )
-        }
-    }
-}
-
-@Composable
-fun OrderFooter(order: Order) {
-    Row(
-        modifier = Modifier
-            .padding(top = 15.dp)
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.baseline_store_24),
-            contentDescription = "Add",
-            modifier = Modifier
-                .padding(end = 10.dp)
-        )
-        Text("${order.store?.name} - ${order.store?.city} ${order.store?.zipCode}", fontWeight = FontWeight.SemiBold)
-    }
-}
-
 
 @Preview(showBackground = true)
 @Composable
 fun OrderListPreview() {
     DwitchAppTheme {
-        MainScreen()
+        OrdersScreen()
     }
 }

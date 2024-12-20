@@ -17,6 +17,8 @@ converter-moshi = "2.11.0"
 moshi-adapter = "1.15.2"
 lifecycle-viewmodel-compose = "2.8.7"
 secretsGradlePlugin = "2.0.1"
+navigation-compose = "2.8.4"
+serialization = "1.6.3"
 
 
 [libraries]
@@ -41,6 +43,8 @@ codegen = { group = "com.squareup.moshi", name = "moshi-kotlin-codegen", version
 converter-moshi = { group = "com.squareup.retrofit2", name = "converter-moshi", version.ref = "converter-moshi" }
 moshi-adapter = { group = "com.squareup.moshi", name = "moshi-adapters", version.ref = "moshi-adapter" }
 lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle-viewmodel-compose" }
+navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization"}
 
 
 [plugins]
@@ -48,5 +52,5 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 secrets-gradle = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
-
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
